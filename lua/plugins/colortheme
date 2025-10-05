@@ -1,0 +1,54 @@
+return {
+  -- Catppuccin 主题
+  {
+	"catppuccin/nvim",
+	name = "catppuccin",
+	lazy = false,          -- 启动时加载
+	priority = 1000,       -- 高优先级，防止被其他主题覆盖
+	config = function()
+	  require("catppuccin").setup({
+		flavour = "frappe",              -- 主题风格：frappe
+		transparent_background = true,   -- 背景透明
+		styles = {
+		  sidebars = "transparent",      -- 侧边栏透明
+		  floats = "transparent",        -- 浮动窗口透明
+		},
+	  })
+	  vim.cmd("colorscheme catppuccin") -- 启用 Catppuccin 主题
+	end,
+  },
+
+  -- Gruvbox 主题
+  {
+	"ellisonleao/gruvbox.nvim",
+	lazy = true,            -- 延迟加载，可按需加载
+	config = function()
+	  require("gruvbox").setup({
+		terminal_colors = true,        -- 终端颜色支持
+		undercurl = true,
+		underline = true,
+		bold = true,
+		italic = {
+		  strings = true,
+		  emphasis = true,
+		  comments = true,
+		  operators = false,
+		  folds = true,
+		},
+		strikethrough = true,
+		invert_selection = false,
+		invert_signs = false,
+		invert_tabline = false,
+		inverse = true,                 -- 搜索、diff、状态栏反色
+		contrast = "",                  -- 对比度设置，可选 "hard"/"soft"/""
+		palette_overrides = {},
+		overrides = {},
+		dim_inactive = false,
+		transparent_mode = true,        -- 背景透明
+	  })
+	  -- 可以按需切换主题
+	  vim.cmd("colorscheme gruvbox")
+	end,
+  },
+}
+

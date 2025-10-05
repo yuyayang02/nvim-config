@@ -1,0 +1,69 @@
+return {
+	"stevearc/conform.nvim",
+	event = { "BufWritePre" }, -- 在保存前加载（更高性能）
+	cmd = { "ConformInfo", "ConformEnable", "ConformDisable" },
+	opts = {
+		notify_on_error = true,
+		format_after_save = function(bufnr)
+			if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
+				return
+			end
+			return {
+				timeout_ms = 5000,
+				lsp_format = "fallback",
+			}
+		end,
+		formatters_by_ft = {
+			lua = { "stylua" },
+			--python = { "yapf", "isort" },
+			rust = { "rustfmt" },
+			go = { "gofmt", "goimports" },
+			--sh = { "shfmt" },
+			--	snakemake = { "snakefmt" },
+			markdown = { "cbfmt" },
+			--typst = { "typstyle" },
+			--nix = { "nixfmt" },
+			--			json = { "prettierd" },
+			toml = { "taplo" },
+			--tex = { "tex-fmt" },
+		},
+		formatters = {
+			cbfmt = {
+				command = "cbfmt",
+				args = { "-w", "--config", vim.fn.expand("~") .. "/AppData/Local/nvim/cbfmt.toml", "$FILENAME" },
+			},
+			taplo = {
+				command = "taplo",
+				args = { "fmt", "--option", "indent_tables=false", "-" },
+			},
+			ruff_fix = {
+				command = "ruff",
+				args = { "check", "--select", "I", "--fix", "--stdin-filename", "$FILENAME", "-" },
+				stdin = true,
+			},
+		},
+	},
+	config = function(_, opts)
+		require("conform").setup(opts)
+
+		-- 用户命令：禁用自动格式化
+		vim.api.nvim_create_user_command("ConformDisable", function(args)
+			if args.bang then
+				vim.b.disable_autoformat = true
+			else
+				vim.g.disable_autoformat = true
+			end
+		end, {
+			desc = "Disable autoformat-on-save",
+			bang = true,
+		})
+
+		-- 用户命令：重新启用自动格式化
+		vim.api.nvim_create_user_command("ConformEnable", function()
+			vim.b.disable_autoformat = false
+			vim.g.disable_autoformat = false
+		end, {
+			desc = "Re-enable autoformat-on-save",
+		})
+	end,
+}
